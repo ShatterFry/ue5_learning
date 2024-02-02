@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "MagicHealthComponent.h"
 #include "MagicHUD.h"
 #include "Engine/LocalPlayer.h"
 
@@ -54,6 +55,9 @@ ATP_FirstPersonCharacter::ATP_FirstPersonCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	HealthComponent = CreateDefaultSubobject<UMagicHealthComponent>(TEXT("CharacterHealth"));
+	OnTakeRadialDamage.AddUniqueDynamic(HealthComponent, &UMagicHealthComponent::OnTakeRadialDamage);
+	OnTakeAnyDamage.AddUniqueDynamic(HealthComponent, &UMagicHealthComponent::OnTakeAnyDamage);
 }
 
 void ATP_FirstPersonCharacter::BeginPlay()

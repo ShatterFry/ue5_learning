@@ -29,7 +29,7 @@ AMagicThrowable::AMagicThrowable()
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	// ProjectileMovement->InitialSpeed = 3000.f;
+	ProjectileMovement->InitialSpeed = 1000.f;
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
@@ -42,18 +42,39 @@ AMagicThrowable::AMagicThrowable()
 void AMagicThrowable::BeginPlay()
 {
 	Super::BeginPlay();
-	FTimerHandle timerHandle;
-	FTimerDelegate delegate = FTimerDelegate::CreateUObject(this, &AMagicThrowable::OnTriggered);
-	GetWorld()->GetTimerManager().SetTimer(timerHandle, delegate, 10.0f, false);
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+
+	{
+		FTimerHandle timerHandle;
+        const FTimerDelegate delegate = FTimerDelegate::CreateUObject(this, &AMagicThrowable::OnTriggered);
+        TimerManager.SetTimer(timerHandle, delegate, 10.0f, false);	
+	}
+	
+	FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &AMagicThrowable::DrawCurrentPosition);
+	TimerManager.SetTimer(DebugTimerHandle, Delegate, 0.05f, true);
 }
 
 void AMagicThrowable::OnTriggered()
 {
-	UE_LOG(LogTemp, Display, TEXT("OnTriggered"));
+	UE_LOG(LogTemp, Display, TEXT("Throwable OnTriggered"));
+	
 	bool bDamageApplied = UGameplayStatics::ApplyRadialDamage(GetWorld(), 100.0f, GetActorLocation(), 500.0f,
 		UDamageType::StaticClass(),{}, this);
-	UE_LOG(LogTemp, Display, TEXT("DamageApplied: %d"), bDamageApplied);
+	UE_LOG(LogTemp, Display, TEXT("bDamageApplied: %s"), bDamageApplied ? TEXT("YES") : TEXT("NO"));
+	UGameplayStatics::PlaySoundAtLocation(this, TriggerSound, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(this, TriggerParticles, GetActorLocation());
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.ClearTimer(DebugTimerHandle);
+	
 	Destroy();
+}
+
+void AMagicThrowable::DrawCurrentPosition()
+{
+	UE_LOG(LogTemp, Display, TEXT("Draw debug figure"));
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 25.0f, 5, FColor::Purple, false, 10.0f);
 }
 
 void AMagicThrowable::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

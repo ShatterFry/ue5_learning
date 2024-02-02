@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "TP_FirstPersonCharacter.generated.h"
 
+class UMagicHealthComponent;
 class UMagicHUD;
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -29,6 +30,9 @@ class ATP_FirstPersonCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category = Magic, meta=(AllowPrivateAccess = "true"))
+	UMagicHealthComponent* HealthComponent;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))

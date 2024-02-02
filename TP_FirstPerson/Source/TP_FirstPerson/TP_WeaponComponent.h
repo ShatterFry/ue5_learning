@@ -41,9 +41,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* FireAction;
 
+	// TODO: hold - aiming, release - throw grenade
+
 	/** Throw Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* ThrowAction;
+
+	/** Throw Aiming Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* ThrowAimingAction;
 
 	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
@@ -60,6 +66,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Throw();
 
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void ThrowAiming();
+
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
@@ -68,4 +77,7 @@ protected:
 private:
 	/** The Character holding this weapon*/
 	ATP_FirstPersonCharacter* Character;
+
+	FVector GetGrenadeSpawnLocation();
+	FRotator GetGrenadeSpawnRotation();
 };

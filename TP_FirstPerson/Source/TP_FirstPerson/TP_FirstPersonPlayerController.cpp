@@ -3,9 +3,13 @@
 
 #include "TP_FirstPersonPlayerController.h"
 #include "EnhancedInputSubsystems.h"
+#include "MagicCheatManagerExtension.h"
+#include "GameFramework/CheatManager.h"
 
 void ATP_FirstPersonPlayerController::BeginPlay()
 {
+	UE_LOG(LogTemp, Display, TEXT("Controller BeginPlay"));
+	
 	Super::BeginPlay();
 
 	// get the enhanced input subsystem
@@ -15,5 +19,16 @@ void ATP_FirstPersonPlayerController::BeginPlay()
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 
 		UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
+	}
+
+	if(CheatManager)
+	{
+		UE_LOG(LogTemp, Display, TEXT("CheatManager is valid!"));
+		UMagicCheatManagerExtension* CheatManagerExtension = NewObject<UMagicCheatManagerExtension>(CheatManager);
+		CheatManager->AddCheatManagerExtension(CheatManagerExtension);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("CheatManager is NOT valid!"));
 	}
 }

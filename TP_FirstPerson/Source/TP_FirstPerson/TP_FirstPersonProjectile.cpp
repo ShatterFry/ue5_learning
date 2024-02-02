@@ -3,6 +3,8 @@
 #include "TP_FirstPersonProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DamageEvents.h"
+#include "Kismet/GameplayStatics.h"
 
 ATP_FirstPersonProjectile::ATP_FirstPersonProjectile() 
 {
@@ -33,11 +35,15 @@ ATP_FirstPersonProjectile::ATP_FirstPersonProjectile()
 
 void ATP_FirstPersonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UE_LOG(LogTemp, Display, TEXT("Projectile OnHit OtherComp: %s"), *OtherComp->GetName());
+	
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
+		FPointDamageEvent DamageEvent;
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+		OtherActor->TakeDamage(20.0f, DamageEvent, PlayerController, this);
 		Destroy();
 	}
 }

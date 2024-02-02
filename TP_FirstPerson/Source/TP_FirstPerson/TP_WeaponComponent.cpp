@@ -68,7 +68,7 @@ void UTP_WeaponComponent::Fire()
 
 void UTP_WeaponComponent::Throw()
 {
-	UE_LOG(LogTemp, Display, TEXT("Throwing!"));
+	UE_LOG(LogTemp, Display, TEXT("WeaponComponent - Throwing a grenade!"));
 
 	if (Character == nullptr || Character->GetController() == nullptr)
 	{
@@ -87,10 +87,41 @@ void UTP_WeaponComponent::Throw()
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+			// TODO: Draw debug spheres on projectile path
 	
 			// Spawn the projectile at the muzzle
 			World->SpawnActor<AMagicThrowable>(GrenadeProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
+	}
+}
+
+void UTP_WeaponComponent::ThrowAiming()
+{
+	UE_LOG(LogTemp, Display, TEXT("TP_WeaponComponent ThrowAiming"));
+	
+	if (Character == nullptr || Character->GetController() == nullptr)
+	{
+		return;
+	}
+
+	// ForwardVector
+	// GetForwardVector
+	float ThrowableInitialSpeed = 1000.0f;
+	
+	//FVector LaunchVelocity = GetOwner()->GetActorForwardVector();
+	FVector LaunchVelocity = GetGrenadeSpawnRotation().Vector();
+	LaunchVelocity  *= ThrowableInitialSpeed;
+	
+	FPredictProjectilePathParams PredictProjectilePathParams = FPredictProjectilePathParams(10.0f, GetGrenadeSpawnLocation(),
+		LaunchVelocity, 10.0f);
+	FPredictProjectilePathResult PredictResult;
+	UGameplayStatics::PredictProjectilePath(this, PredictProjectilePathParams, PredictResult);
+	for(const FPredictProjectilePathPointData& PointData : PredictResult.PathData)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Location: %s Velocity: %s Time: %f"), *PointData.Location.ToString(),
+			*PointData.Velocity.ToString(), PointData.Time);
+		DrawDebugSphere(GetWorld(), PointData.Location, 10.0f, 5, FColor::Red, false, 10.0f);
 	}
 }
 
@@ -126,6 +157,8 @@ void UTP_WeaponComponent::AttachWeapon(ATP_FirstPersonCharacter* TargetCharacter
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
 			// Throw
 			EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Throw);
+			// Throw Aiming
+			EnhancedInputComponent->BindAction(ThrowAimingAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::ThrowAiming);
 		}
 	}
 }
@@ -144,4 +177,18 @@ void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			Subsystem->RemoveMappingContext(FireMappingContext);
 		}
 	}
+}
+
+FVector UTP_WeaponComponent::GetGrenadeSpawnLocation()
+{
+	// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+	const FVector SpawnLocation = GetOwner()->GetActorLocation() + GetGrenadeSpawnRotation().RotateVector(MuzzleOffset);
+	return SpawnLocation;
+}
+
+FRotator UTP_WeaponComponent::GetGrenadeSpawnRotation()
+{
+	APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+	const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
+	return SpawnRotation;
 }
