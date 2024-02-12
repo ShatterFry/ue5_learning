@@ -104,12 +104,9 @@ void UTP_WeaponComponent::ThrowAiming()
 	{
 		return;
 	}
-
-	// ForwardVector
-	// GetForwardVector
+	
 	float ThrowableInitialSpeed = 1000.0f;
 	
-	//FVector LaunchVelocity = GetOwner()->GetActorForwardVector();
 	FVector LaunchVelocity = GetGrenadeSpawnRotation().Vector();
 	LaunchVelocity  *= ThrowableInitialSpeed;
 	
@@ -117,6 +114,7 @@ void UTP_WeaponComponent::ThrowAiming()
 		LaunchVelocity, 10.0f);
 	FPredictProjectilePathResult PredictResult;
 	UGameplayStatics::PredictProjectilePath(this, PredictProjectilePathParams, PredictResult);
+	
 	for(const FPredictProjectilePathPointData& PointData : PredictResult.PathData)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Location: %s Velocity: %s Time: %f"), *PointData.Location.ToString(),

@@ -12,6 +12,8 @@
 #include "MagicHealthComponent.h"
 #include "MagicHUD.h"
 #include "Engine/LocalPlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "SaveGame/MagicLocalPlayerSaveGame.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -23,13 +25,13 @@ void ATP_FirstPersonCharacter::OnWeaponFired()
 	UE_LOG(LogTemp, Display, TEXT("ATP_FirstPersonCharacter::OnWeaponFired"));
 	--BulletCount;
 	UE_LOG(LogTemp, Display, TEXT("BulletCount = %d"), BulletCount);
-	mMagicHUD->SetBulletsText(BulletCount);
+	mMagicHUD->OnBulletsCountChanged(BulletCount);
 }
 
 void ATP_FirstPersonCharacter::OnAmmoPickUp()
 {
 	BulletCount += 10;
-	mMagicHUD->SetBulletsText(BulletCount);
+	mMagicHUD->OnBulletsCountChanged(BulletCount);
 }
 
 ATP_FirstPersonCharacter::ATP_FirstPersonCharacter()
@@ -92,6 +94,12 @@ void ATP_FirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATP_FirstPersonCharacter::Look);
+
+		// SaveGame
+		EnhancedInputComponent->BindAction(SaveGameAction, ETriggerEvent::Triggered, this, &ATP_FirstPersonCharacter::SaveGame);
+
+		// LoadGme
+		EnhancedInputComponent->BindAction(LoadGameAction, ETriggerEvent::Triggered, this, &ATP_FirstPersonCharacter::LoadGame);
 	}
 	else
 	{
@@ -133,6 +141,48 @@ void ATP_FirstPersonCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ATP_FirstPersonCharacter::SaveGame(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Display, TEXT("SaveGame"));
+	
+	if(USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SaveSlotName, SaveSlotIndex))
+	{
+		UMagicLocalPlayerSaveGame* MagicSaveGame = CastChecked<UMagicLocalPlayerSaveGame>(SaveGame);
+		if(MagicSaveGame->IsSaveGameInProgress())
+		{
+			return;
+		}
+	}
+	
+	UMagicLocalPlayerSaveGame* SaveGame = CastChecked<UMagicLocalPlayerSaveGame>(UGameplayStatics::CreateSaveGameObject(UMagicLocalPlayerSaveGame::StaticClass()));
+	FVector ActorLocation = GetActorLocation();
+	UE_LOG(LogTemp, Display, TEXT("ActorLocation: %s"), *ActorLocation.ToString());
+	SaveGame->SetActorLocation(ActorLocation);
+	SaveGame->SetActorRotation(GetActorRotation());
+	SaveGame->SetSaveGameInProgress(true);
+	
+	UGameplayStatics::AsyncSaveGameToSlot(SaveGame, SaveSlotName, SaveSlotIndex, FAsyncSaveGameToSlotDelegate::CreateLambda([&](const FString& SlotName, const int32 UserIndex, bool bSuccessful)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Save completed! %s %d %d"), *SlotName, UserIndex, bSuccessful);
+		SaveGame->SetSaveGameInProgress(false);
+	}));
+}
+
+void ATP_FirstPersonCharacter::LoadGame(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Display, TEXT("LoadGame"));
+
+	bool SaveExists = UGameplayStatics::DoesSaveGameExist(SaveSlotName, SaveSlotIndex);
+
+	if(USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SaveSlotName, SaveSlotIndex))
+	{
+		const UMagicLocalPlayerSaveGame* MagicSaveGame = CastChecked<UMagicLocalPlayerSaveGame>(SaveGame);
+		const FVector ActorLocation = MagicSaveGame->GetActorLocation();
+		UE_LOG(LogTemp, Display, TEXT("ActorLocation = %s"), *ActorLocation.ToString());
+		TeleportTo(ActorLocation, MagicSaveGame->GetActorRotation());
 	}
 }
 

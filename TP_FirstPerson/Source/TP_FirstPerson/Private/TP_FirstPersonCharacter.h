@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "TP_FirstPersonCharacter.generated.h"
 
+class USaveGame;
 class UMagicHealthComponent;
 class UMagicHUD;
 class UInputComponent;
@@ -45,6 +47,15 @@ class ATP_FirstPersonCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* SaveGameAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> LoadGameAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Magic, meta=(AllowPrivateAccess = "true"))
+	TSubclassOf<USaveGame> SaveGameClass;
 	
 public:
 	ATP_FirstPersonCharacter();
@@ -80,6 +91,9 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	void SaveGame(const FInputActionValue& Value);
+	void LoadGame(const FInputActionValue& Value);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -87,6 +101,8 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void SetHUD(UMagicHUD* InHUD);
+
+	
 
 public:
 	/** Returns Mesh1P subobject **/
@@ -103,5 +119,8 @@ private:
 	int32 BulletCount = 0;
 	
 	TObjectPtr<UMagicHUD> mMagicHUD;
+
+	FString SaveSlotName = TEXT("SaveGameSlot");
+	int32 SaveSlotIndex = 0;
 };
 

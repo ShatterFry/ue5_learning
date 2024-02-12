@@ -7,6 +7,12 @@
 #include "GameFramework/CheatManager.h"
 #include "Kismet/GameplayStatics.h"
 
+static TAutoConsoleVariable<bool> CVarMagicInstantEnemyKill(
+	TEXT("InstantEnemyKill"),
+	false,
+	TEXT("Instant kill player enemied")
+);
+
 // Sets default values for this component's properties
 UMagicHealthComponent::UMagicHealthComponent()
 {
@@ -54,7 +60,9 @@ void UMagicHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, 
 	UE_LOG(LogTemp, Display, TEXT("DamageScale = %d"), DamageScale);
 	Health -= FMath::RoundToInt32(Damage * DamageScale);
 
-	if(Health <= 0)
+	bool bInstantKill = CVarMagicInstantEnemyKill.GetValueOnGameThread();
+	UE_LOG(LogTemp, Display, TEXT("Instant enemy kill: %d"), bInstantKill);
+	if(Health <= 0 || bInstantKill)
 	{
 		DamagedActor->Destroy();
 	}
