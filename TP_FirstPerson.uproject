@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{3DE6142E-4D5F-37E1-3015-879C851471CF}",
+	"EngineAssociation": "",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -12,6 +12,15 @@
 				"GameplayAbilities",
 				"UMG",
 				"Engine"
+			]
+		},
+		{
+			"Name": "MyModuleTest",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"CoreUObject"
 			]
 		}
 	],

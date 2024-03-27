@@ -14,6 +14,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "SaveGame/MagicLocalPlayerSaveGame.h"
+#include "Globals/GlobalGameStructs.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -30,7 +31,14 @@ void ATP_FirstPersonCharacter::OnWeaponFired()
 
 void ATP_FirstPersonCharacter::OnAmmoPickUp()
 {
-	BulletCount += 10;
+	UE_LOG(LogTemp, Display, TEXT("Character OnAmmoPickUp"));
+
+	FSoftObjectPath TablePath = FSoftObjectPath("/Game/Tables/GameplayDataTable.GameplayDataTable");
+	UDataTable* DataTable = LoadObject<UDataTable>(nullptr, *TablePath.ToString(), nullptr, LOAD_None, nullptr);
+	check(DataTable);
+	FMagicAmmoGameplayDataTableRow* RowData = DataTable->FindRow<FMagicAmmoGameplayDataTableRow>(FName("AmmoPickUp"), TEXT("DataTest"));
+
+	BulletCount += RowData->BulletsCapacity;
 	mMagicHUD->OnBulletsCountChanged(BulletCount);
 }
 
@@ -60,6 +68,7 @@ ATP_FirstPersonCharacter::ATP_FirstPersonCharacter()
 	HealthComponent = CreateDefaultSubobject<UMagicHealthComponent>(TEXT("CharacterHealth"));
 	OnTakeRadialDamage.AddUniqueDynamic(HealthComponent, &UMagicHealthComponent::OnTakeRadialDamage);
 	OnTakeAnyDamage.AddUniqueDynamic(HealthComponent, &UMagicHealthComponent::OnTakeAnyDamage);
+	UE_LOG(LogTemp, Display, TEXT("Constructor Character InitialHealth: %d"), InitialHealth);
 }
 
 void ATP_FirstPersonCharacter::BeginPlay()
@@ -67,6 +76,13 @@ void ATP_FirstPersonCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Display, TEXT("BeginPlay Character InitialHealth: %d"), InitialHealth);
+	HealthComponent->SetInitialHealth(InitialHealth);
+	HealthComponent->SetHealth(InitialHealth);
+	
+	const FText HealthText = FText::FromString(FString::Printf(TEXT("Health: %d"), GetHealth()));
+	mMagicHUD->SetHealthText(HealthText);
+	
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -96,10 +112,15 @@ void ATP_FirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATP_FirstPersonCharacter::Look);
 
 		// SaveGame
-		EnhancedInputComponent->BindAction(SaveGameAction, ETriggerEvent::Triggered, this, &ATP_FirstPersonCharacter::SaveGame);
+		EnhancedInputComponent->BindAction(SaveGameAction, ETriggerEvent::Triggered, this,
+			&ATP_FirstPersonCharacter::SaveGame);
 
 		// LoadGme
-		EnhancedInputComponent->BindAction(LoadGameAction, ETriggerEvent::Triggered, this, &ATP_FirstPersonCharacter::LoadGame);
+		EnhancedInputComponent->BindAction(LoadGameAction, ETriggerEvent::Triggered, this,
+			&ATP_FirstPersonCharacter::LoadGame);
+
+		EnhancedInputComponent->BindAction(FlightAction, ETriggerEvent::Triggered, this,
+			&ATP_FirstPersonCharacter::Fly);
 	}
 	else
 	{
@@ -115,6 +136,21 @@ void ATP_FirstPersonCharacter::SetHUD(UMagicHUD* InHUD)
 int32 ATP_FirstPersonCharacter::GetBulletsCount()
 {
 	return BulletCount;
+}
+
+int32 ATP_FirstPersonCharacter::GetHealth() const
+{
+	return HealthComponent->GetHealth();
+}
+
+int32 ATP_FirstPersonCharacter::GetInitialHealth() const
+{
+	return InitialHealth;
+}
+
+UMagicHUD* ATP_FirstPersonCharacter::GetHUD()
+{
+	return mMagicHUD;
 }
 
 
@@ -184,6 +220,19 @@ void ATP_FirstPersonCharacter::LoadGame(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Display, TEXT("ActorLocation = %s"), *ActorLocation.ToString());
 		TeleportTo(ActorLocation, MagicSaveGame->GetActorRotation());
 	}
+}
+
+void ATP_FirstPersonCharacter::Fly(const FInputActionValue& Value)
+{
+	const APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	FRotator ControlRotation = PlayerController->GetControlRotation();
+	APawn* PlayerPawn = PlayerController->GetPawn();
+	ATP_FirstPersonCharacter* PlayerCharacter = Cast<ATP_FirstPersonCharacter>(PlayerPawn);
+	
+	const FVector UpVector = GetActorUpVector();
+	const FVector2D MoveDirection = Value.Get<FVector2D>();
+	UE_LOG(LogTemp, Display, TEXT("Fly input: %s"), *MoveDirection.ToString());
+	AddMovementInput(UpVector, MoveDirection.X);
 }
 
 void ATP_FirstPersonCharacter::SetHasRifle(bool bNewHasRifle)

@@ -4,6 +4,7 @@
 #include "TP_FirstPersonPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "MagicCheatManagerExtension.h"
+#include "Cheats/MagicCheatManager.h"
 #include "GameFramework/CheatManager.h"
 
 void ATP_FirstPersonPlayerController::BeginPlay()
@@ -31,4 +32,7 @@ void ATP_FirstPersonPlayerController::BeginPlay()
 	{
 		UE_LOG(LogTemp, Display, TEXT("CheatManager is NOT valid!"));
 	}
+
+	MagicCheatManager = NewObject<UMagicCheatManager>(this, UMagicCheatManager::StaticClass());
+	CheatManager = MagicCheatManager;
 }

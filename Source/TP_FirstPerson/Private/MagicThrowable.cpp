@@ -4,6 +4,7 @@
 #include "MagicThrowable.h"
 
 #include "Components/SphereComponent.h"
+#include "DamageTypes/ThrowableDamageType.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -38,6 +39,16 @@ AMagicThrowable::AMagicThrowable()
 	//InitialLifeSpan = 3.0f;
 }
 
+float AMagicThrowable::GetDamageRadius() const
+{
+	return DamageRadius;
+}
+
+float AMagicThrowable::GetImpulseStrength() const
+{
+	return ImpulseStrength;
+}
+
 // Called when the game starts or when spawned
 void AMagicThrowable::BeginPlay()
 {
@@ -57,10 +68,22 @@ void AMagicThrowable::BeginPlay()
 
 void AMagicThrowable::OnTriggered()
 {
-	UE_LOG(LogTemp, Display, TEXT("Throwable OnTriggered"));
+	UE_LOG(LogTemp, Display, TEXT("AMagicThrowable OnTriggered"));
 	
-	bool bDamageApplied = UGameplayStatics::ApplyRadialDamage(GetWorld(), 100.0f, GetActorLocation(), 500.0f,
-		UDamageType::StaticClass(),{}, this);
+	FVector DamageOrigin = GetActorLocation();
+	DrawDebugSphere(GetWorld(), DamageOrigin, DamageRadius, 5, FColor::Emerald, false,
+		60.0f);
+	UE_VLOG_LOCATION(this, TEXT("MagicThrowable"), Log, DamageOrigin, DamageRadius, FColor::Blue, TEXT("Damage zone"));
+	UClass* DamageTypeClass = UThrowableDamageType::StaticClass();
+	//UClass* DamageTypeClass = UDamageType::StaticClass();
+	
+	const bool bDamageApplied = UGameplayStatics::ApplyRadialDamage(GetWorld(), 100.0f,
+		GetActorLocation(),
+		DamageRadius,
+		DamageTypeClass,
+		{}, this, nullptr, false,
+		ECC_Visibility);
+	
 	UE_LOG(LogTemp, Display, TEXT("bDamageApplied: %s"), bDamageApplied ? TEXT("YES") : TEXT("NO"));
 	UGameplayStatics::PlaySoundAtLocation(this, TriggerSound, GetActorLocation());
 	UGameplayStatics::SpawnEmitterAtLocation(this, TriggerParticles, GetActorLocation());
@@ -75,9 +98,42 @@ void AMagicThrowable::DrawCurrentPosition()
 {
 	UE_LOG(LogTemp, Display, TEXT("Draw debug figure"));
 	DrawDebugSphere(GetWorld(), GetActorLocation(), 25.0f, 5, FColor::Purple, false, 10.0f);
+	
+#if ENABLE_VISUAL_LOG
+	const ELogVerbosity::Type DefaultVerbosity = ELogVerbosity::Log;
+	const FName CategoryName = TEXT("Throwable location");
+	const FLinearColor Color = FLinearColor::Blue;
+	const FString Text = FString::Printf(TEXT("%s"), *GetActorLocation().ToString());
+	
+	FVisualLogger::GeometryShapeLogf(this, CategoryName, DefaultVerbosity,
+		GetActorLocation(), 50.0f, Color.ToFColor(true), TEXT("%s"), *Text);
+#endif
 }
 
 void AMagicThrowable::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Display, TEXT("OnHit"));
+	UE_LOG(LogTemp, Display, TEXT("AMagicThrowable::OnHit()"));
 }
+
+#if ENABLE_VISUAL_LOG
+void AMagicThrowable::GrabDebugSnapshot(FVisualLogEntry* Snapshot) const
+{
+	UE_LOG(LogTemp, Display, TEXT("void AMagicThrowable::GrabDebugSnapshot(FVisualLogEntry* Snapshot) const"));
+	
+	//IVisualLoggerDebugSnapshotInterface::GrabDebugSnapshot(Snapshot);
+	
+	//const int32 CatIndex = Snapshot->Status.AddZeroed();
+	//FVisualLogStatusCategory& PlaceableCategory = Snapshot->Status[CatIndex];
+
+	FVisualLogStatusCategory PlaceableCategory;
+	PlaceableCategory.Category = TEXT("GDC Sample");
+	PlaceableCategory.Add(TEXT("Projectile Class"), GetClass()->GetName());
+
+	Snapshot->Status.Add(PlaceableCategory);
+}
+
+void AMagicThrowable::DescribeSelfToVisLog(FVisualLogEntry* Snapshot) const
+{
+	UE_LOG(LogTemp, Display, TEXT("void AMagicThrowable::DescribeSelfToVisLog(FVisualLogEntry* Snapshot) const"));
+}
+#endif

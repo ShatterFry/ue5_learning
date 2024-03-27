@@ -7,14 +7,15 @@
 #include "TP_FirstPersonPlayerController.generated.h"
 
 class UInputMappingContext;
+class UMagicCheatManager;
 
-/**
- *
- */
 UCLASS()
 class TP_FIRSTPERSON_API ATP_FirstPersonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+	UPROPERTY()
+	TObjectPtr<UMagicCheatManager> MagicCheatManager;
 	
 protected:
 

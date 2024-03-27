@@ -3,6 +3,8 @@
 
 #include "MagicCheatManagerExtension.h"
 
+#include "TP_FirstPersonCharacter.h"
+
 void UMagicCheatManagerExtension::CheatSetDamageScale(int32 InDamageScale)
 {
 	UE_LOG(LogTemp, Display, TEXT("CheatSetDamageScale: %d"), InDamageScale);

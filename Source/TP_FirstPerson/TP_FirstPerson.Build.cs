@@ -9,6 +9,6 @@ public class TP_FirstPerson : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] { "GameplayAbilities" });
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "MyModuleTest" });
 	}
 }

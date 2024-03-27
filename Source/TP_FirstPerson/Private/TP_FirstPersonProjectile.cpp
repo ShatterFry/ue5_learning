@@ -35,7 +35,7 @@ ATP_FirstPersonProjectile::ATP_FirstPersonProjectile()
 
 void ATP_FirstPersonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Display, TEXT("Projectile OnHit OtherComp: %s"), *OtherComp->GetName());
+	UE_LOG(LogTemp, Display, TEXT("ATP_FirstPersonProjectile OnHit OtherComp: %s"), *OtherComp->GetName());
 	
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())

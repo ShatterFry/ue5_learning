@@ -36,6 +36,11 @@ void UMagicHUD::SetBulletsText(int32 InBullets, bool InAnimated)
 	mBulletsText->SetText(FText::FromString(formattedText));
 }
 
+void UMagicHUD::SetHealthText(FText InText)
+{
+	HealthText->SetText(InText);
+}
+
 void UMagicHUD::HandleTimerAnimation()
 {
 	UE_LOG(LogTemp, Display, TEXT("HandleTimerAnimation"));

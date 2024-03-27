@@ -20,6 +20,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetBulletsText(int32 InBullets, bool InAnimated);
 
+	UFUNCTION(BlueprintCallable)
+	void SetHealthText(FText InText);
+
 	UFUNCTION()
 	void HandleTimerAnimation();
 
@@ -32,6 +35,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Transient, meta = (BindWidgetAnim))
 	TObjectPtr<UWidgetAnimation> IncreaseAnim;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> HealthText;
 	
 private:
 	FTimerHandle AnimTimerHandle;

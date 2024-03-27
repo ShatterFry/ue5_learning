@@ -25,6 +25,9 @@ class ATP_FirstPersonCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	UPROPERTY(Config)
+	int32 InitialHealth = 100;
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* Mesh1P;
@@ -47,6 +50,9 @@ class ATP_FirstPersonCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* FlightAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SaveGameAction;
@@ -83,6 +89,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetBulletsCount();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetHealth() const;
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetInitialHealth() const;
+
+	UFUNCTION(BlueprintCallable)
+	UMagicHUD* GetHUD();
 	
 protected:
 	/** Called for movement input */
@@ -93,6 +108,8 @@ protected:
 
 	void SaveGame(const FInputActionValue& Value);
 	void LoadGame(const FInputActionValue& Value);
+
+	void Fly(const FInputActionValue& Value);
 
 protected:
 	// APawn interface
@@ -115,10 +132,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnAmmoPickUp();
 
+protected:
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UMagicHUD> mMagicHUD;
+
 private:
 	int32 BulletCount = 0;
-	
-	TObjectPtr<UMagicHUD> mMagicHUD;
 
 	FString SaveSlotName = TEXT("SaveGameSlot");
 	int32 SaveSlotIndex = 0;
