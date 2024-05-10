@@ -7,6 +7,7 @@
 #include "MagicHUD.generated.h"
 
 class UTextBlock;
+class UImage;
 
 UCLASS()
 class TP_FIRSTPERSON_API UMagicHUD : public UUserWidget
@@ -26,6 +27,9 @@ public:
 	UFUNCTION()
 	void HandleTimerAnimation();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnWeaponChanged();
+
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> mBulletsText;
@@ -38,6 +42,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> HealthText;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UImage> mCrosshair;
 	
 private:
 	FTimerHandle AnimTimerHandle;

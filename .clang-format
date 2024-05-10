@@ -1,0 +1,7 @@
+---
+Language: Cpp
+UseTab: true
+IndentWidth: 4
+
+DerivePointerAlignment: false
+PointerAlignment: Left

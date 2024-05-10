@@ -19,4 +19,7 @@ class UMagicCheatManager : public UCheatManager
 
 	UFUNCTION(Exec)
 	void CheatAddBullets(int32 InBullets);
+
+	UFUNCTION(Exec)
+	void CheatSetCrosshairType(int32 InCrosshairType);
 };

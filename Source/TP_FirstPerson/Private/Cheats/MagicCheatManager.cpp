@@ -45,3 +45,9 @@ void UMagicCheatManager::CheatAddBullets(int32 InBullets)
 	ATP_FirstPersonCharacter* PlayerCharacter = Cast<ATP_FirstPersonCharacter>(PlayerPawn);
 	PlayerCharacter->OnAmmoPickUp();
 }
+
+void UMagicCheatManager::CheatSetCrosshairType(int32 InCrosshairType)
+{
+	UE_LOG(LogTemp, Display, TEXT("UMagicCheatManager::CheatSetCrosshairType"));
+}
+

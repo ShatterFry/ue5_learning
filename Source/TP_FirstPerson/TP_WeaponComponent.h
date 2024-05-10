@@ -51,6 +51,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* ThrowAimingAction;
 
+	/** Weapon Change Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* WeaponChangeAction;
+
 	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
 
@@ -68,6 +72,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void ThrowAiming();
+
+	/** Change the selected weapon */
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void WeaponChange(const FInputActionValue& Value);
 
 protected:
 	/** Ends gameplay for this component. */

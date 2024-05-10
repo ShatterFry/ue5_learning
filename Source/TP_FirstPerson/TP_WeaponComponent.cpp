@@ -153,12 +153,24 @@ void UTP_WeaponComponent::AttachWeapon(ATP_FirstPersonCharacter* TargetCharacter
 		{
 			// Fire
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
+
 			// Throw
 			EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Throw);
+
 			// Throw Aiming
 			EnhancedInputComponent->BindAction(ThrowAimingAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::ThrowAiming);
+
+			// Weapon Change
+			EnhancedInputComponent->BindAction(WeaponChangeAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::WeaponChange);
+			EnhancedInputComponent->BindAction(WeaponChangeAction, ETriggerEvent::Triggered, Character, &ATP_FirstPersonCharacter::OnWeaponChanged);
+
+			EnhancedInputComponent->BindAction(WeaponChangeAction, ETriggerEvent::Started, this, &UTP_WeaponComponent::WeaponChange);
+			EnhancedInputComponent->BindAction(WeaponChangeAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::WeaponChange);
+			EnhancedInputComponent->BindAction(WeaponChangeAction, ETriggerEvent::Canceled, this, &UTP_WeaponComponent::WeaponChange);
 		}
 	}
+
+	
 }
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -190,3 +202,12 @@ FRotator UTP_WeaponComponent::GetGrenadeSpawnRotation()
 	const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 	return SpawnRotation;
 }
+
+void UTP_WeaponComponent::WeaponChange(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Display, TEXT("TP_WeaponComponent WeaponChange() Code"));
+	//FVector2D LookAxisVector = Value.Get<FVector2D>();
+	float WeaponChnageValue = Value.Get<float>();
+	UE_LOG(LogTemp, Display, TEXT("Value = %f"), WeaponChnageValue);
+}
+

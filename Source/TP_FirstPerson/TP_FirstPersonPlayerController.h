@@ -8,6 +8,7 @@
 
 class UInputMappingContext;
 class UMagicCheatManager;
+class AMagicWidgetController;
 
 UCLASS()
 class TP_FIRSTPERSON_API ATP_FirstPersonPlayerController : public APlayerController
@@ -16,6 +17,9 @@ class TP_FIRSTPERSON_API ATP_FirstPersonPlayerController : public APlayerControl
 
 	UPROPERTY()
 	TObjectPtr<UMagicCheatManager> MagicCheatManager;
+
+	UPROPERTY()
+	TObjectPtr<AMagicWidgetController> WidgetController;
 	
 protected:
 
@@ -27,6 +31,6 @@ protected:
 protected:
 
 	virtual void BeginPlay() override;
-
+	virtual void PostInitializeComponents() override;
 	// End Actor interface
 };

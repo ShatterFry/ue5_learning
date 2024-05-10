@@ -129,6 +129,12 @@ public:
 
 	void OnWeaponFired();
 
+	DECLARE_DELEGATE(FOnWeaponChanged)
+	FOnWeaponChanged OnWeaponChangedDelegate;
+
+	UFUNCTION()
+	void OnWeaponChanged(const FInputActionValue& Value);
+
 	UFUNCTION(BlueprintCallable)
 	void OnAmmoPickUp();
 
@@ -141,5 +147,8 @@ private:
 
 	FString SaveSlotName = TEXT("SaveGameSlot");
 	int32 SaveSlotIndex = 0;
+
+	UFUNCTION(BlueprintCallable)
+	void BPCallableTestFunc();
 };
 

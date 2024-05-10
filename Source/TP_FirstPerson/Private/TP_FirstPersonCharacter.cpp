@@ -42,6 +42,12 @@ void ATP_FirstPersonCharacter::OnAmmoPickUp()
 	mMagicHUD->OnBulletsCountChanged(BulletCount);
 }
 
+void ATP_FirstPersonCharacter::OnWeaponChanged(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Display, TEXT("Character OnWeaponChanged"));
+	OnWeaponChangedDelegate.ExecuteIfBound();
+}
+
 ATP_FirstPersonCharacter::ATP_FirstPersonCharacter()
 {
 	// Character doesnt have a rifle at start
@@ -131,6 +137,7 @@ void ATP_FirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 void ATP_FirstPersonCharacter::SetHUD(UMagicHUD* InHUD)
 {
 	mMagicHUD = InHUD;
+	OnWeaponChangedDelegate.BindUObject(mMagicHUD, &UMagicHUD::OnWeaponChanged);
 }
 
 int32 ATP_FirstPersonCharacter::GetBulletsCount()
@@ -244,3 +251,13 @@ bool ATP_FirstPersonCharacter::GetHasRifle()
 {
 	return bHasRifle;
 }
+
+void ATP_FirstPersonCharacter::BPCallableTestFunc()
+{
+	UE_LOG(LogTemp, Display, TEXT("void ATP_FirstPersonCharacter::BPCallableTestFunc() BEGIN"));
+	FDebug::DumpStackTraceToLog(ELogVerbosity::Display);
+	UE_LOG(LogTemp, Display, TEXT("void ATP_FirstPersonCharacter::BPCallableTestFunc() END"));
+}
+
+
+
