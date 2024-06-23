@@ -2,6 +2,7 @@
 
 
 #include "TP_FirstPersonPlayerController.h"
+#include "TP_FirstPersonCharacter.h"
 #include "EnhancedInputSubsystems.h"
 #include "MagicCheatManagerExtension.h"
 #include "Cheats/MagicCheatManager.h"
@@ -36,6 +37,9 @@ void ATP_FirstPersonPlayerController::BeginPlay()
 
 	MagicCheatManager = NewObject<UMagicCheatManager>(this, UMagicCheatManager::StaticClass());
 	CheatManager = MagicCheatManager;
+
+	ATP_FirstPersonCharacter* FirstPersonCharacter = Cast<ATP_FirstPersonCharacter>(GetPawn());
+	FirstPersonCharacter->OnGamePauseRequestedDelegate.BindUObject(this, &ATP_FirstPersonPlayerController::OnGamePauseRequested);
 }
 
 void ATP_FirstPersonPlayerController::PostInitializeComponents()
@@ -48,3 +52,9 @@ void ATP_FirstPersonPlayerController::PostInitializeComponents()
 	WidgetController = GetWorld()->SpawnActor<AMagicWidgetController>(SpawnInfo);
 	WidgetController->Possess(GetPawn());
 }
+
+void ATP_FirstPersonPlayerController::OnGamePauseRequested()
+{
+
+}
+

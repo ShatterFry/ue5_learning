@@ -17,6 +17,7 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
+class UMagicPauseMenu;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -60,11 +61,20 @@ class ATP_FirstPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> LoadGameAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> PauseGameAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Magic, meta=(AllowPrivateAccess = "true"))
 	TSubclassOf<USaveGame> SaveGameClass;
 	
 public:
 	ATP_FirstPersonCharacter();
+
+	DECLARE_DELEGATE(FOnGamePauseRequested)
+	FOnGamePauseRequested OnGamePauseRequestedDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	void OnGamePauseRequested();
 
 protected:
 	virtual void BeginPlay();
@@ -141,6 +151,9 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<UMagicHUD> mMagicHUD;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UMagicPauseMenu> mPauseMenu;
 
 private:
 	int32 BulletCount = 0;

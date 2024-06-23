@@ -33,4 +33,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
 	// End Actor interface
+
+private:
+	UFUNCTION()
+	void OnGamePauseRequested();
 };

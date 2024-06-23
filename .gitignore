@@ -95,5 +95,6 @@ TP_FirstPerson/Content/__ExternalActors__/FirstPerson/Maps/FirstPersonMap/
 TP_FirstPerson/Content/__ExternalObjects__/FirstPerson/Maps/FirstPersonMap/
 TP_FirstPerson/Plugins/Developer/RiderLink/
 *.DotSettings.user
-.p4config
+
+*.p4config
 .p4ignore

@@ -6,4 +6,5 @@
 void AMagicWidgetController::BeginPlay()
 {
 	UE_LOG(LogTemp, Display, TEXT("Widget Controller Begin Play"));
+	//FCoreDelegates::ApplicationWillDeactivateDelegate.AddUObject(this, function);
 }

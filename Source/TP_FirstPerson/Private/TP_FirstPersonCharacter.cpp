@@ -15,6 +15,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "SaveGame/MagicLocalPlayerSaveGame.h"
 #include "Globals/GlobalGameStructs.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "UI/MagicPauseMenu.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -127,6 +129,8 @@ void ATP_FirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 		EnhancedInputComponent->BindAction(FlightAction, ETriggerEvent::Triggered, this,
 			&ATP_FirstPersonCharacter::Fly);
+
+		EnhancedInputComponent->BindAction(PauseGameAction, ETriggerEvent::Triggered, this, &ATP_FirstPersonCharacter::OnGamePauseRequested);
 	}
 	else
 	{
@@ -257,6 +261,31 @@ void ATP_FirstPersonCharacter::BPCallableTestFunc()
 	UE_LOG(LogTemp, Display, TEXT("void ATP_FirstPersonCharacter::BPCallableTestFunc() BEGIN"));
 	FDebug::DumpStackTraceToLog(ELogVerbosity::Display);
 	UE_LOG(LogTemp, Display, TEXT("void ATP_FirstPersonCharacter::BPCallableTestFunc() END"));
+}
+
+void ATP_FirstPersonCharacter::OnGamePauseRequested()
+{
+	UE_LOG(LogTemp, Display, TEXT("Called %s"), ANSI_TO_TCHAR(__FUNCTION__));
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	const bool bShouldPause = !PlayerController->IsPaused();
+
+	UGameplayStatics::SetGamePaused(GetWorld(), bShouldPause);
+	PlayerController->SetShowMouseCursor(bShouldPause);
+
+	if (bShouldPause)
+	{
+		mPauseMenu->SetIsFocusable(true);
+		//UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerController, mPauseMenu);
+		mPauseMenu->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		OnGamePauseRequestedDelegate.ExecuteIfBound();
+	}
+	else
+	{
+		GetHUD()->SetIsFocusable(true);
+		//UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerController, GetHUD());
+		mPauseMenu->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 
