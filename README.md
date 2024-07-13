@@ -3,10 +3,36 @@
 TODO
 - Unit tests/auto tests/functional tests
 - Select weapon with a round wheel menu
-- VFX: healing, weapon shot, energy weapon (electricity, laser)
+- VFX: healing, weapon shot, energy weapon (electricity, laser), projectile, beam
+- SFX
 - UI: glowing material/VFX for buttons
-	- pause menu
-	- fade out to menu (transition)
+	- Pause menu
+		- Keyboards control setup (default/custom)
+	- Fade out to menu (transition)
+	- Floating damage text/damage numbers/floating combat text
+		- Niagara
+		- CommonUI
+		- UMG
+	- CommonUI plugin
+		- Input controller icons
+		- Stack
 - Dynamic Staircase
 	- Use MathExpression node in BP instead of spagetti code
 	- Calc padding scale
+- Aiming
+	- Niagara arc/curve/ribbon for projectile path
+- Interacting with items
+- Dialogue system (Zelda)
+- Gameplay
+	- Weapons
+		- Laser beam
+		- Charging weapons
+		- Grabbing weapons
+	- DOT effects
+	- Damage volumes
+	- Homing projectiles
+- Audio Design
+- AI
+	- Mass crowd Controller
+	- Follow player
+	- Vision perception

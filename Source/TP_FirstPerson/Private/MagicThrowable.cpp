@@ -85,7 +85,12 @@ void AMagicThrowable::OnTriggered()
 		ECC_Visibility);
 	
 	UE_LOG(LogTemp, Display, TEXT("bDamageApplied: %s"), bDamageApplied ? TEXT("YES") : TEXT("NO"));
+	const FVector ActorLocation = GetActorLocation();
 	UGameplayStatics::PlaySoundAtLocation(this, TriggerSound, GetActorLocation());
+	APawn* NoiseInstigator = GetInstigator();
+	check(NoiseInstigator);
+	float MaxNoiseRange = 10000.0f;
+	MakeNoise(1.0f, NoiseInstigator, ActorLocation, MaxNoiseRange);
 	UGameplayStatics::SpawnEmitterAtLocation(this, TriggerParticles, GetActorLocation());
 
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
